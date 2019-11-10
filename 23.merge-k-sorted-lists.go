@@ -37,26 +37,24 @@ func mergeKLists(lists []*ListNode) *ListNode {
 			break
 		}
 
-		if resultNode == nil {
-			resultNode = new(ListNode)
-			tempNode = resultNode
-		} else {
-			tempNode.Next = new(ListNode)
-			tempNode = tempNode.Next
-		}
-
 		for i := 0; i < len(lists); i++ {
 			if lists[i] == nil {
 				continue
 			}
 
 			if *min == lists[i].Val {
+
+				if resultNode == nil {
+					resultNode = new(ListNode)
+					tempNode = resultNode
+				} else {
+					tempNode.Next = new(ListNode)
+					tempNode = tempNode.Next
+				}
+				tempNode.Val = *min
 				lists[i] = lists[i].Next
-				break
 			}
 		}
-
-		tempNode.Val = *min
 	}
 	return resultNode
 }
