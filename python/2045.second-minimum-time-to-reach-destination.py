@@ -86,7 +86,7 @@ class Solution:
         # print(adj_list)
 
         distances = self.dijkstra(adj_list, 1)
-        print(distances)
+        # print(distances)
         # print(self.n_distances)
 
         return distances[n][-1]
