@@ -10,26 +10,74 @@ from typing import List
 
 
 class Solution:
-    def solve(self, word1: str, word2: str, n: int, m: int) -> int:
-        if m < 0:
-            return n + 1
-        if n < 0:
-            return m + 1
-
-        if word1[n] == word2[m]:
-            return 0 + self.solve(word1, word2, n - 1, m - 1)
-        else:
-            remove = 1 + self.solve(word1, word2, n - 1, m)
-            add = 1 + self.solve(word1, word2, n, m - 1)
-            replace = 1 + self.solve(word1, word2, n - 1, m - 1)
-
-            return min(remove, add, replace)
-
     def minDistance(self, word1: str, word2: str) -> int:
-        n = len(word1)
         m = len(word2)
+        n = len(word1)
+        if m == 0:
+            return n
+        if n == 0:
+            return m
 
-        return self.solve(word1, word2, n - 1, m - 1)
+        matrix: List[List[int]] = [[1] * n for _ in range(m)]
+
+        for i in range(m):
+            for j in range(n):
+                if word2[i] == word1[j]:
+                    matrix[i][j] = 0
+
+        min_matrix: List[List[int]] = [[float("inf")] * n for _ in range(m)]
+        min_matrix[0][0] = matrix[0][0]
+        zero: bool = False
+        for i in range(1, n):
+            if not zero:
+                min_matrix[0][i] = min_matrix[0][i - 1] + matrix[0][i]
+                if matrix[0][i] == 0:
+                    zero = True
+            else:
+                min_matrix[0][i] = min_matrix[0][i - 1] + 1
+        zero = False
+        for i in range(1, m):
+            if not zero:
+                min_matrix[i][0] = min_matrix[i - 1][0] + matrix[i][0]
+                if matrix[i][0] == 0:
+                    zero = True
+            else:
+                min_matrix[i][0] = min_matrix[i - 1][0] + 1
+
+        for i in range(m):
+            for j in range(n):
+                if matrix[i][j] != 0 and j < n - 1 and i >= 1:
+                    pre_right = min_matrix[i][j] + matrix[i][j + 1]
+                    # if matrix[i][j + 1] + matrix[i][j] == 0:
+                    #     pre_right += 1
+
+                    min_matrix[i][j + 1] = min(min_matrix[i][j + 1], pre_right)
+                if i < m - 1 and matrix[i][j] != 0 and j >= 1:
+                    pre_bottom = min_matrix[i][j] + matrix[i + 1][j]
+                    # if matrix[i + 1][j] + matrix[i][j] == 0:
+                    #     pre_bottom += 1
+                    min_matrix[i + 1][j] = min(min_matrix[i + 1][j], pre_bottom)
+
+                if j < n - 1 and i < m - 1:
+                    min_matrix[i + 1][j + 1] = min(
+                        min_matrix[i + 1][j + 1],
+                        min_matrix[i][j] + matrix[i + 1][j + 1],
+                    )
+
+        for i in range(1, n):
+            min_matrix[m - 1][i] = min(
+                min_matrix[m - 1][i - 1] + 1, min_matrix[m - 1][i]
+            )
+
+        for i in range(1, m):
+            min_matrix[i][n - 1] = min(
+                min_matrix[i - 1][n - 1] + 1, min_matrix[i][n - 1]
+            )
+
+        # print(matrix)
+        # print(min_matrix)
+
+        return min_matrix[m - 1][n - 1]
 
 
 # @lc code=end
